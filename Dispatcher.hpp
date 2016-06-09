@@ -80,7 +80,8 @@ namespace DataStructures {
                                         wrapper->doneCondition.notify_one();
                                     }
                                 } else {
-                                    RecycleTaskWrapper(wrapper);
+                                    wrapper->f = nullptr;
+                                    _recycledTaskWrappers.Add(wrapper);
                                 }
                             }
                             dispatchLock.lock();
@@ -115,70 +116,17 @@ namespace DataStructures {
          * @todo Needs documentation
          */
         void Post(std::function< void() > task) {
-            if (std::this_thread::get_id() == _dispatcher.get_id()) {
-                task();
-            } else {
-                std::shared_ptr< TaskWrapper > wrapper = GetTaskWrapper();
-                wrapper->hasWaiter = false;
-                Post(task, wrapper);
-            }
-        }
-
-        /**
-         * @todo Needs documentation
-         */
-        void Do(std::function< void() > task) {
-            if (std::this_thread::get_id() == _dispatcher.get_id()) {
-                task();
-            } else {
-                std::shared_ptr< TaskWrapper > wrapper = GetTaskWrapper();
-                wrapper->hasWaiter = true;
-                wrapper->done = false;
-                Post(task, wrapper);
-                {
-                    std::unique_lock< std::mutex > doneLock(wrapper->doneMutex);
-                    while (!wrapper->done) {
-                        wrapper->doneCondition.wait(doneLock);
-                    }
-                }
-                RecycleTaskWrapper(wrapper);
-            }
-        }
-
-        // Private methods
-    private:
-        /**
-         * @todo Needs documentation
-         */
-        std::shared_ptr< TaskWrapper > GetTaskWrapper() {
             std::shared_ptr< TaskWrapper > wrapper;
             if (!_recycledTaskWrappers.Remove(wrapper)) {
                 wrapper = std::make_shared< TaskWrapper >();
             }
-            return wrapper;
-        }
-
-        /**
-         * @todo Needs documentation
-         */
-        void Post(
-            std::function< void() > task,
-            std::shared_ptr< TaskWrapper > wrapper
-        ) {
+            wrapper->hasWaiter = false;
             wrapper->f = task;
             _tasksToBeDone.Add(wrapper);
-            {
+            if (std::this_thread::get_id() != _dispatcher.get_id()) {
                 std::lock_guard< std::mutex > dispatchLock(_dispatchMutex);
                 _dispatchCondition.notify_one();
             }
-        }
-
-        /**
-         * @todo Needs documentation
-         */
-        void RecycleTaskWrapper(std::shared_ptr< TaskWrapper > wrapper) {
-            wrapper->f = nullptr;
-            _recycledTaskWrappers.Add(wrapper);
         }
 
         // Private properties
