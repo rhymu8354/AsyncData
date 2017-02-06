@@ -58,36 +58,34 @@ namespace DataStructures {
         // Public methods
     public:
         Dispatcher() {
-            _dispatcher = std::move(
-                std::thread(
-                    [this]{
-                        std::unique_lock< std::mutex > dispatchLock(_dispatchMutex);
-                        while (
-                            !_stop
-                            || !_tasksToBeDone.IsEmpty()
-                        ) {
-                            if (_tasksToBeDone.IsEmpty()) {
-                                _dispatchCondition.wait(dispatchLock);
-                            }
-                            dispatchLock.unlock();
-                            while (!_tasksToBeDone.IsEmpty()) {
-                                std::shared_ptr< TaskWrapper > wrapper = _tasksToBeDone.Remove();
-                                wrapper->f();
-                                if (wrapper->hasWaiter) {
-                                    wrapper->done = true;
-                                    {
-                                        std::lock_guard< std::mutex > doneLock(wrapper->doneMutex);
-                                        wrapper->doneCondition.notify_one();
-                                    }
-                                } else {
-                                    wrapper->f = nullptr;
-                                    _recycledTaskWrappers.Add(wrapper);
-                                }
-                            }
-                            dispatchLock.lock();
+            _dispatcher = std::thread(
+                [this]{
+                    std::unique_lock< std::mutex > dispatchLock(_dispatchMutex);
+                    while (
+                        !_stop
+                        || !_tasksToBeDone.IsEmpty()
+                    ) {
+                        if (_tasksToBeDone.IsEmpty()) {
+                            _dispatchCondition.wait(dispatchLock);
                         }
+                        dispatchLock.unlock();
+                        while (!_tasksToBeDone.IsEmpty()) {
+                            std::shared_ptr< TaskWrapper > wrapper = _tasksToBeDone.Remove();
+                            wrapper->f();
+                            if (wrapper->hasWaiter) {
+                                wrapper->done = true;
+                                {
+                                    std::lock_guard< std::mutex > doneLock(wrapper->doneMutex);
+                                    wrapper->doneCondition.notify_one();
+                                }
+                            } else {
+                                wrapper->f = nullptr;
+                                _recycledTaskWrappers.Add(wrapper);
+                            }
+                        }
+                        dispatchLock.lock();
                     }
-                )
+                }
             );
         }
 
