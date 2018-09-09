@@ -1,18 +1,18 @@
-#ifndef DATA_STRUCTURES_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP
-#define DATA_STRUCTURES_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP
+#ifndef ASYNC_DATA_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP
+#define ASYNC_DATA_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP
 
 /**
  * @file MultiProducerSingleConsumerQueue.hpp
  *
- * This module declares the DataStructures::MultiProducerSingleConsumerQueue
+ * This module declares the AsyncData::MultiProducerSingleConsumerQueue
  * class template.
  *
- * Copyright (c) 2015-2016 by Richard Walters
+ * © 2015-2018 by Richard Walters
  */
 
 #include <atomic>
 
-namespace DataStructures {
+namespace AsyncData {
 
     /**
      * This is a template for a lockless multi-producer single-consumer queue.
@@ -21,7 +21,7 @@ namespace DataStructures {
      * http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue
      */
     template< typename T > class MultiProducerSingleConsumerQueue {
-        // Custom types
+        // Types
     public:
         /**
          * This structure holds a single item in the queue, and
@@ -42,24 +42,27 @@ namespace DataStructures {
             struct Node* next = nullptr;
         };
 
-        // Public methods
+        // Lifecycle Management
+    public:
+        ~MultiProducerSingleConsumerQueue() noexcept {
+            while (_head != nullptr) {
+                Node* node = _head;
+                _head = node->next;
+                delete node;
+            }
+        }
+        MultiProducerSingleConsumerQueue(const MultiProducerSingleConsumerQueue&) = delete;
+        MultiProducerSingleConsumerQueue(MultiProducerSingleConsumerQueue&&) noexcept = default;
+        MultiProducerSingleConsumerQueue& operator(const MultiProducerSingleConsumerQueue&) = delete;
+        MultiProducerSingleConsumerQueue& operator(MultiProducerSingleConsumerQueue&&) noexcept = default;
+
+        // Public Methods
     public:
         /**
          * This is the object constructor.
          */
         MultiProducerSingleConsumerQueue() {
             _head = _tail = new Node();
-        }
-
-        /**
-         * This is the object destructor.
-         */
-        ~MultiProducerSingleConsumerQueue() {
-            while (_head != nullptr) {
-                Node* node = _head;
-                _head = node->next;
-                delete node;
-            }
         }
 
         /**
@@ -100,7 +103,7 @@ namespace DataStructures {
             return item;
         }
 
-        // Private properties
+        // Private Properties
     private:
         /**
          * This points to a sentinel node with an empty value, whose next
@@ -117,4 +120,4 @@ namespace DataStructures {
 
 }
 
-#endif /* DATA_STRUCTURES_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP */
+#endif /* ASYNC_DATA_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP */

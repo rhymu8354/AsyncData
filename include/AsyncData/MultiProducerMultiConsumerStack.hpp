@@ -1,24 +1,24 @@
-#ifndef DATA_STRUCTURES_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP
-#define DATA_STRUCTURES_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP
+#ifndef ASYNC_DATA_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP
+#define ASYNC_DATA_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP
 
 /**
  * @file MultiProducerMultiConsumerStack.hpp
  *
- * This module declares the DataStructures::MultiProducerMultiConsumerStack
+ * This module declares the AsyncData::MultiProducerMultiConsumerStack
  * class template.
  *
- * Copyright (c) 2015-2016 by Richard Walters
+ * © 2015-2018 by Richard Walters
  */
 
 #include <atomic>
 
-namespace DataStructures {
+namespace AsyncData {
 
     /**
      * @todo Needs documentation
      */
     template< typename T > class MultiProducerMultiConsumerStack {
-        // Custom types
+        // Types
     public:
         /**
          * @todo Needs documentation
@@ -28,21 +28,24 @@ namespace DataStructures {
             struct Node* next = nullptr;
         };
 
-        // Public methods
+        // Lifecycle Management
     public:
-        MultiProducerMultiConsumerStack()
-            : _top(nullptr)
-        {
-        }
-
-        /**
-         * @todo Needs documentation
-         */
-        ~MultiProducerMultiConsumerStack() {
+        ~MultiProducerMultiConsumerStack() noexcept {
             while (!IsEmpty()) {
                 T item;
                 (void)Remove(item);
             }
+        }
+        MultiProducerMultiConsumerStack(const MultiProducerMultiConsumerStack&) = delete;
+        MultiProducerMultiConsumerStack(MultiProducerMultiConsumerStack&&) noexcept = default;
+        MultiProducerMultiConsumerStack& operator=(const MultiProducerMultiConsumerStack&) = delete;
+        MultiProducerMultiConsumerStack& operator=(MultiProducerMultiConsumerStack&&) noexcept = default;
+
+        // Public Methods
+    public:
+        MultiProducerMultiConsumerStack()
+            : _top(nullptr)
+        {
         }
 
         /**
@@ -80,7 +83,7 @@ namespace DataStructures {
             return true;
         }
 
-        // Private properties
+        // Private Properties
     private:
         /**
          * @todo Needs documentation
@@ -90,4 +93,4 @@ namespace DataStructures {
 
 }
 
-#endif /* DATA_STRUCTURES_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP */
+#endif /* ASYNC_DATA_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP */
