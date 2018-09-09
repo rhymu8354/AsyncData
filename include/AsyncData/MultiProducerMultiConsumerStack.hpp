@@ -37,9 +37,9 @@ namespace AsyncData {
             }
         }
         MultiProducerMultiConsumerStack(const MultiProducerMultiConsumerStack&) = delete;
-        MultiProducerMultiConsumerStack(MultiProducerMultiConsumerStack&&) noexcept = default;
+        MultiProducerMultiConsumerStack(MultiProducerMultiConsumerStack&&) = default;
         MultiProducerMultiConsumerStack& operator=(const MultiProducerMultiConsumerStack&) = delete;
-        MultiProducerMultiConsumerStack& operator=(MultiProducerMultiConsumerStack&&) noexcept = default;
+        MultiProducerMultiConsumerStack& operator=(MultiProducerMultiConsumerStack&&) = default;
 
         // Public Methods
     public:

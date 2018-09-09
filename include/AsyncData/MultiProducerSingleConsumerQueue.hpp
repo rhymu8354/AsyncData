@@ -52,9 +52,9 @@ namespace AsyncData {
             }
         }
         MultiProducerSingleConsumerQueue(const MultiProducerSingleConsumerQueue&) = delete;
-        MultiProducerSingleConsumerQueue(MultiProducerSingleConsumerQueue&&) noexcept = default;
-        MultiProducerSingleConsumerQueue& operator(const MultiProducerSingleConsumerQueue&) = delete;
-        MultiProducerSingleConsumerQueue& operator(MultiProducerSingleConsumerQueue&&) noexcept = default;
+        MultiProducerSingleConsumerQueue(MultiProducerSingleConsumerQueue&&) = default;
+        MultiProducerSingleConsumerQueue& operator=(const MultiProducerSingleConsumerQueue&) = delete;
+        MultiProducerSingleConsumerQueue& operator=(MultiProducerSingleConsumerQueue&&) = default;
 
         // Public Methods
     public:
