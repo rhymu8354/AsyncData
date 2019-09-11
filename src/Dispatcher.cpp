@@ -4,7 +4,7 @@
  * This module contains the implementation of the
  * AsyncData::Dispatcher class.
  *
- * © 2015-2018 by Richard Walters
+ * © 2015-2019 by Richard Walters
  */
 
 #include <AsyncData/Dispatcher.hpp>
@@ -22,32 +22,35 @@ namespace AsyncData {
      */
     struct Dispatcher::Impl {
         /**
-         * @todo Needs documentation
+         * This is the queue of tasks that have yet to be performed.
          */
         MultiProducerSingleConsumerQueue< std::shared_ptr< TaskWrapper > > tasksToBeDone;
 
         /**
-         * @todo Needs documentation
+         * This holds previously used task wrappers, so that the burden
+         * on the dynamic memory allocation system is reduced.
          */
         MultiProducerMultiConsumerStack< std::shared_ptr< TaskWrapper > > recycledTaskWrappers;
 
         /**
-         * @todo Needs documentation
+         * This is the worker thread which calls all queued job functions.
          */
         std::thread dispatcher;
 
         /**
-         * @todo Needs documentation
+         * This is set when the worker thread is told to exit.
          */
         bool stop = false;
 
         /**
-         * @todo Needs documentation
+         * This is used to coordinate between waking up the worker thread
+         * and having the worker thread wait for the queue not to be empty.
          */
         std::mutex dispatchMutex;
 
         /**
-         * @todo Needs documentation
+         * This is used to wake up the worker thread once the job queue is no
+         * longer empty, or the worker thread is told to stop.
          */
         std::condition_variable dispatchCondition;
     };

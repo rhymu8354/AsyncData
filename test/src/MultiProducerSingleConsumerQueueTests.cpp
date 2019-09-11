@@ -11,7 +11,17 @@
 #include <AsyncData/MultiProducerSingleConsumerQueue.hpp>
 
 TEST(MultiProducerSingleConsumerQueueTests, PushPop) {
-}
-
-TEST(MultiProducerSingleConsumerQueueTests, ThreadSafety) {
+    AsyncData::MultiProducerSingleConsumerQueue< int > queue;
+    EXPECT_TRUE(queue.IsEmpty());
+    queue.Add(1);
+    EXPECT_FALSE(queue.IsEmpty());
+    queue.Add(2);
+    EXPECT_FALSE(queue.IsEmpty());
+    int first, second;
+    first = queue.Remove();
+    EXPECT_FALSE(queue.IsEmpty());
+    second = queue.Remove();
+    EXPECT_TRUE(queue.IsEmpty());
+    EXPECT_EQ(1, first);
+    EXPECT_EQ(2, second);
 }

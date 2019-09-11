@@ -11,7 +11,17 @@
 #include <AsyncData/MultiProducerMultiConsumerStack.hpp>
 
 TEST(MultiProducerMultiConsumerStackTests, PushPop) {
-}
-
-TEST(MultiProducerMultiConsumerStackTests, ThreadSafety) {
+    AsyncData::MultiProducerMultiConsumerStack< int > stack;
+    EXPECT_TRUE(stack.IsEmpty());
+    stack.Add(1);
+    EXPECT_FALSE(stack.IsEmpty());
+    stack.Add(2);
+    EXPECT_FALSE(stack.IsEmpty());
+    int first, second;
+    stack.Remove(first);
+    EXPECT_FALSE(stack.IsEmpty());
+    stack.Remove(second);
+    EXPECT_TRUE(stack.IsEmpty());
+    EXPECT_EQ(2, first);
+    EXPECT_EQ(1, second);
 }

@@ -1,12 +1,11 @@
-#ifndef ASYNC_DATA_DISPATCHER_HPP
-#define ASYNC_DATA_DISPATCHER_HPP
+#pragma once
 
 /**
  * @file Dispatcher.hpp
  *
  * This module declares the AsyncData::Dispatcher class.
  *
- * © 2015-2018 by Richard Walters
+ * © 2015-2019 by Richard Walters
  */
 
 #include <condition_variable>
@@ -17,37 +16,47 @@
 namespace AsyncData {
 
     /**
-     * @todo Needs documentation
+     * This class operates a worker thread which executes jobs.  A job consists
+     * of a function to be called by the worker thread and a mechanism through
+     * which another thread can poll or wait for the function call to be
+     * completed and obtain the return value, if any.
      */
     class Dispatcher {
         // Types
     public:
         /**
-         * @todo Needs documentation
+         * This is an entry in the dispatcher's queue, represing some
+         * kind of work to do, and the objects used to coordinate
+         * with the client of the work.
          */
         struct TaskWrapper {
             /**
-             * @todo Needs documentation
+             * This is the function to call in order to perform the requested
+             * work.
              */
             std::function< void() > f;
 
             /**
-             * @todo Needs documentation
+             * This is set to true if the client is waiting for the work
+             * to be completed.
              */
             bool hasWaiter = false;
 
             /**
-             * @todo Needs documentation
+             * If the client is waiting for the work to be completed, this is
+             * used to coordinate waking up the client.
              */
             std::mutex doneMutex;
 
             /**
-             * @todo Needs documentation
+             * If the client is waiting for the work to be completed, this is
+             * notified in order to wake up the client.
              */
             std::condition_variable doneCondition;
 
             /**
-             * @todo Needs documentation
+             * If the client is waiting for the work to be completed, this is
+             * set once the work is completed.
              */
             bool done = false;
         };
@@ -68,12 +77,16 @@ namespace AsyncData {
         Dispatcher();
 
         /**
-         * @todo Needs documentation
+         * Immediately cancel and drop all queued work that has not yet been
+         * started, wait for any work in progress to be completed, and
+         * join the worker thread.
          */
         void Stop();
 
         /**
-         * @todo Needs documentation
+         * Add a function to the queue of the dispatcher, to be called
+         * from the dispatcher's worker thread, once all previously
+         * queued tasks have been completed.
          */
         void Post(std::function< void() > task);
 
@@ -93,5 +106,3 @@ namespace AsyncData {
     };
 
 }
-
-#endif /* ASYNC_DATA_DISPATCHER_HPP */

@@ -1,5 +1,4 @@
-#ifndef ASYNC_DATA_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP
-#define ASYNC_DATA_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP
+#pragma once
 
 /**
  * @file MultiProducerSingleConsumerQueue.hpp
@@ -7,7 +6,7 @@
  * This module declares the AsyncData::MultiProducerSingleConsumerQueue
  * class template.
  *
- * © 2015-2018 by Richard Walters
+ * © 2015-2019 by Richard Walters
  */
 
 #include <atomic>
@@ -16,6 +15,11 @@ namespace AsyncData {
 
     /**
      * This is a template for a lockless multi-producer single-consumer queue.
+     *
+     * This implements a unidirectional queue of arbitrary items, where it's
+     * safe to push items onto the tail of the queue from different threads and
+     * pop items off the head of the queue from a single thread without the use
+     * of locking mechanisms such as mutexes.
      *
      * It is based on the algorithm described here:
      * http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue
@@ -119,5 +123,3 @@ namespace AsyncData {
     };
 
 }
-
-#endif /* ASYNC_DATA_MULTI_PRODUCER_SINGLE_CONSUMER_QUEUE_HPP */

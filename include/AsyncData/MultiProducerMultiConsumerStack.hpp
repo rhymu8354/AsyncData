@@ -1,5 +1,4 @@
-#ifndef ASYNC_DATA_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP
-#define ASYNC_DATA_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP
+#pragma once
 
 /**
  * @file MultiProducerMultiConsumerStack.hpp
@@ -7,7 +6,7 @@
  * This module declares the AsyncData::MultiProducerMultiConsumerStack
  * class template.
  *
- * © 2015-2018 by Richard Walters
+ * © 2015-2019 by Richard Walters
  */
 
 #include <atomic>
@@ -15,16 +14,25 @@
 namespace AsyncData {
 
     /**
-     * @todo Needs documentation
+     * This implements a stack of arbitrary items, where it's safe to push onto
+     * and pull items off of the stack from different threads without the use
+     * of locking mechanisms such as mutexes.
      */
     template< typename T > class MultiProducerMultiConsumerStack {
         // Types
     public:
         /**
-         * @todo Needs documentation
+         * This holds one item on the stack.
          */
         struct Node {
+            /**
+             * This provides storage for the item.
+             */
             T item;
+
+            /**
+             * This points to the next item on the stack.
+             */
             struct Node* next = nullptr;
         };
 
@@ -49,7 +57,10 @@ namespace AsyncData {
         }
 
         /**
-         * @todo Needs documentation
+         * Push the given item onto the stack.
+         *
+         * @param[in] item
+         *     This is the item to push onto the stack.
          */
         void Add(T item) {
             Node* node = new Node;
@@ -59,14 +70,26 @@ namespace AsyncData {
         }
 
         /**
-         * @todo Needs documentation
+         * Return an indication of whether or not the stack is empty.
+         *
+         * @return
+         *     An indication of whether or not the stack is empty is returned.
          */
         bool IsEmpty() const {
             return (_top.load() == nullptr);
         }
 
         /**
-         * @todo Needs documentation
+         * Pop the item on the top of the stack.
+         *
+         * @param[out] item
+         *     This is where to store the item popped off the stack.
+         *
+         * @return
+         *     An indication of whether or not an item was popped off
+         *     the stack is returned.  This will be false if the stack
+         *     was empty before the call, or if another thread beats us
+         *     to it.
          */
         bool Remove(T& item) {
             Node* node = _top.load();
@@ -86,11 +109,9 @@ namespace AsyncData {
         // Private Properties
     private:
         /**
-         * @todo Needs documentation
+         * This points to the top of the stack.
          */
         std::atomic< Node* > _top;
     };
 
 }
-
-#endif /* ASYNC_DATA_MULTI_PRODUCER_MULTI_CONSUMER_STACK_HPP */
